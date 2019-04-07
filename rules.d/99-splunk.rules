@@ -1,0 +1,13 @@
+polkit.addRule(function(action, subject) { 
+	if (action.id == "org.freedesktop.systemd1.manage-units" 
+		&& subject.user == "splunk") { 
+		try { 
+			polkit.spawn(["/usr/local/bin/polkit_splunk", ""+subject.pid]); 
+			return polkit.Result.YES; 
+		} 
+		catch (error) { 
+			return polkit.Result.AUTH_ADMIN; 
+		} 
+	}
+});
+

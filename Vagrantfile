@@ -11,9 +11,14 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     wget https://download.splunk.com/products/splunk/releases/7.2.5.1/linux/splunk-7.2.5.1-962d9a8e1586-linux-2.6-x86_64.rpm > /dev/null 2>&1
     yum localinstall -y splunk-7.2.5.1-962d9a8e1586-linux-2.6-x86_64.rpm
-    cp /vagrant/rules.d/99-splunk.rules /etc/polkit/rules.d
+    cp /vagrant/rules.d/99-splunk.rules /etc/polkit-1/rules.d/
     cp /vagrant/bin/polkit_splunk /usr/local/bin/polkit_splunk
     chmod 755 /usr/local/bin/polkit_splunk
     systemctl restart polkit
+    /opt/splunk/bin/splunk enable boot-start --accept-license --answer-yes --no-prompt  -user splunk
+    cp /vagrant/splunk/user-seed.conf /opt/splunk/etc/system/local/user-seed.conf
+    chown -R splunk:splunk /opt/splunk
+    sudo systemctl daemon-reload
+    sudo systemctl start Splunkd.service
   SHELL
 end
